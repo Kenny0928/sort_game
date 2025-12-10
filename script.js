@@ -60,14 +60,24 @@ class SortGame {
     init() {
         ui.gameTitle.innerText = this.title;
         ui.controls.innerHTML = ''; // Clear controls
-        this.array = this.generateRandomArray(5); // Difficulty: 5 items
+
+        // Read size from input
+        let sizeInput = document.getElementById('input-size');
+        let size = parseInt(sizeInput.value);
+
+        // Validation constraint
+        if (isNaN(size) || size < 5) size = 5;
+        if (size > 20) size = 20;
+        sizeInput.value = size; // Update UI to reflect constrained value
+
+        this.array = this.generateRandomArray(size);
         this.isComplete = false;
         this.render();
         this.startLogic();
     }
 
     generateRandomArray(size) {
-        return Array.from({ length: size }, () => Math.floor(Math.random() * 9) + 1);
+        return Array.from({ length: size }, () => Math.floor(Math.random() * 99) + 1); // 1-99 makes more sense for larger sets? or keep 1-9
     }
 
     render() {
@@ -455,4 +465,3 @@ class SelectionSortGame extends SortGame {
 
 // Initial Listener
 ui.btnBack.addEventListener('click', backToMenu);
-ui.btnReset.addEventListener('click', resetGame);
