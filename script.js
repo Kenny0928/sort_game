@@ -272,59 +272,29 @@ class InsertionSortGame extends SortGame {
     }
 
     showSlots() {
-        // Create slots before index 0, and between 0..sortedEndIndex
-        // We need to visualize slots. Since structure is flat, we inject slots visually.
-        // Actually, easier strategy: Render the whole board with slots interleaved for the sorted part.
-
         ui.board.innerHTML = '';
 
-        // Render Sorted Part with Slots
-        for (let i = 0; i <= this.sortedEndIndex; i++) {
-            // Slot before i
-            this.createSlot(i);
-
-            // The Card i
-            let card = this.createCardElement(this.array[i], i);
-            card.classList.add('sorted');
-            ui.board.appendChild(card);
-        }
-        // Slot after the last sorted element
-        this.createSlot(this.sortedEndIndex + 1);
-
-        // Render Unsorted Part (start from sortedEndIndex + 2 because sortedEndIndex+1 is the one currently picked/floating)
-        // Wait, visually we want to see the picked card too? 
-        // Let's just render the picked card separately or at the end for now to simplify, 
-        // OR render it in place but 'ghosted'. 
-
-        // Simpler Reflow:
-        // Clear board.
-        // Loop 0 to sortedEndIndex:
-        //   Append Slot(i) -> Append Card(i)
-        // Append Slot(sortedEndIndex + 1)
-        // Append Divider?
-        // Append Selected Card (floating)
-        // Append Rest of cards
-
-        // Let's rebuild the array view just for this phase
-
         // 1. Slots and Sorted Cards
+        // We render slots relative to the sorted array indices
         for (let i = 0; i <= this.sortedEndIndex; i++) {
             this.createSlot(i);
             ui.board.appendChild(this.createCardElement(this.array[i], i, true)); // true = isSorted
         }
+        // Final slot for the sorted area
         this.createSlot(this.sortedEndIndex + 1);
 
-        // 2. The Selected Card (visually separated)
+        // 2. The Selected Card (visually separated to indicate it's being moved)
         const selectedContainer = document.createElement('div');
-        selectedContainer.style.marginLeft = '20px';
+        selectedContainer.style.marginLeft = '20px'; // Visual gap
         selectedContainer.style.display = 'flex';
         selectedContainer.style.gap = '15px';
+        selectedContainer.style.alignItems = 'center';
 
         const selected = this.createCardElement(this.currentVal, this.currentIndex);
         selected.classList.add('selected');
         selectedContainer.appendChild(selected);
 
-        // 3. The rest
+        // 3. The rest of the unsorted cards
         for (let i = this.currentIndex + 1; i < this.array.length; i++) {
             selectedContainer.appendChild(this.createCardElement(this.array[i], i));
         }
