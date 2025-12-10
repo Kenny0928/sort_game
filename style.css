@@ -36,27 +36,69 @@ body {
 
 /* Animations */
 @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    10% { transform: translateX(-5px); }
-    30% { transform: translateX(5px); }
-    50% { transform: translateX(-5px); }
-    70% { transform: translateX(5px); }
-    90% { transform: translateX(-5px); }
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    10% {
+        transform: translateX(-5px);
+    }
+
+    30% {
+        transform: translateX(5px);
+    }
+
+    50% {
+        transform: translateX(-5px);
+    }
+
+    70% {
+        transform: translateX(5px);
+    }
+
+    90% {
+        transform: translateX(-5px);
+    }
 }
 
 @keyframes flash {
-    0% { background-color: var(--white); }
-    50% { background-color: #d5f5e3; transform: scale(1.1); }
-    100% { background-color: var(--white); }
+    0% {
+        background-color: var(--white);
+    }
+
+    50% {
+        background-color: #d5f5e3;
+        transform: scale(1.1);
+    }
+
+    100% {
+        background-color: var(--white);
+    }
 }
 
 @keyframes popIn {
-    0% { opacity: 0; transform: scale(0.5); }
-    100% { opacity: 1; transform: scale(1); }
+    0% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
-.shake { animation: shake 0.4s ease-in-out; border-color: var(--danger) !important; color: var(--danger) !important; }
-.flash { animation: flash 0.5s ease-out; }
+.shake {
+    animation: shake 0.4s ease-in-out;
+    border-color: var(--danger) !important;
+    color: var(--danger) !important;
+}
+
+.flash {
+    animation: flash 0.5s ease-out;
+}
 
 /* Views */
 .view {
@@ -123,10 +165,29 @@ body {
     margin-bottom: 20px;
 }
 
+.settings-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#input-size {
+    padding: 8px;
+    border: 2px solid #bdc3c7;
+    border-radius: 8px;
+    font-size: 1rem;
+    width: 70px;
+    text-align: center;
+    font-weight: bold;
+    color: var(--dark);
+}
+
 .game-title {
     font-size: 1.5rem;
     color: var(--dark);
     font-weight: bold;
+    display: none;
+    /* Hide title in game view to save space, or move it if needed */
 }
 
 .instruction-box {
@@ -137,7 +198,8 @@ body {
     margin-bottom: 30px;
     font-size: 1.1rem;
     font-weight: 500;
-    min-height: 56px; /* fixed height to prevent jump */
+    min-height: 56px;
+    /* fixed height to prevent jump */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -151,9 +213,11 @@ body {
     margin-bottom: 30px;
     gap: 15px;
     padding: 20px;
-    flex-wrap: wrap; /* Safe wrap for small screens */
+    flex-wrap: wrap;
+    /* Safe wrap for small screens */
     border-radius: 12px;
-    background-color: #f8f9fa; /* Subtle background area */
+    background-color: #f8f9fa;
+    /* Subtle background area */
 }
 
 /* Card Styles */
@@ -176,12 +240,38 @@ body {
 }
 
 /* Modifier States */
-.card.sorted { background-color: var(--success); color: white; border-color: var(--success); }
-.card.comparing { border-color: var(--primary); transform: scale(1.1); z-index: 10; }
-.card.selected { border-color: var(--warning); background-color: #fff9c4; transform: translateY(-10px); z-index: 20; box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
-.card.pivot { border-color: var(--danger); }
-.card.clickable { cursor: pointer; }
-.card.clickable:hover { transform: translateY(-5px); border-color: #bdc3c7; }
+.card.sorted {
+    background-color: var(--success);
+    color: white;
+    border-color: var(--success);
+}
+
+.card.comparing {
+    border-color: var(--primary);
+    transform: scale(1.1);
+    z-index: 10;
+}
+
+.card.selected {
+    border-color: var(--warning);
+    background-color: #fff9c4;
+    transform: translateY(-10px);
+    z-index: 20;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+.card.pivot {
+    border-color: var(--danger);
+}
+
+.card.clickable {
+    cursor: pointer;
+}
+
+.card.clickable:hover {
+    transform: translateY(-5px);
+    border-color: #bdc3c7;
+}
 
 /* Control Area */
 .controls-area {
@@ -198,31 +288,68 @@ body {
     cursor: pointer;
     font-weight: bold;
     transition: all 0.2s;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.btn:active { transform: scale(0.95); }
-.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn:active {
+    transform: scale(0.95);
+}
 
-.btn-primary { background-color: var(--primary); color: white; }
-.btn-primary:hover { background-color: var(--primary-dark); }
-.btn-danger { background-color: var(--danger); color: white; }
-.btn-success { background-color: var(--success); color: white; }
-.btn-outline { background-color: transparent; border: 2px solid #ccc; color: #7f8c8d; }
-.btn-outline:hover { border-color: var(--dark); color: var(--dark); }
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+}
+
+.btn-danger {
+    background-color: var(--danger);
+    color: white;
+}
+
+.btn-success {
+    background-color: var(--success);
+    color: white;
+}
+
+.btn-outline {
+    background-color: transparent;
+    border: 2px solid #ccc;
+    color: #7f8c8d;
+}
+
+.btn-outline:hover {
+    border-color: var(--dark);
+    color: var(--dark);
+}
 
 /* Insertion Sort Slots */
 .slot {
     width: 20px;
     height: 80px;
     border-radius: 4px;
-    background-color: rgba(0,0,0,0.05);
+    background-color: rgba(0, 0, 0, 0.05);
     transition: all 0.2s;
     cursor: pointer;
-    display: none; /* Hidden by default */
+    display: none;
+    /* Hidden by default */
 }
-.slot.active { display: block; }
-.slot:hover { background-color: var(--warning); transform: scaleX(1.5); }
+
+.slot.active {
+    display: block;
+}
+
+.slot:hover {
+    background-color: var(--warning);
+    transform: scaleX(1.5);
+}
 
 /* Divider for Insertion Sort */
 .divider {
