@@ -15,8 +15,7 @@ const ui = {
     instruction: document.getElementById('instruction-text'),
     board: document.getElementById('game-board'),
     controls: document.getElementById('controls-area'),
-    btnBack: document.getElementById('btn-back'),
-    btnReset: document.getElementById('btn-reset')
+    btnBack: document.getElementById('btn-back')
 };
 
 // --- View Switching ---
@@ -34,6 +33,7 @@ function startGame(type) {
     else if (type === 'insertion') App.gameInstance = new InsertionSortGame();
     else if (type === 'selection') App.gameInstance = new SelectionSortGame();
 
+    // Slight delay to allow view transition if needed, but synchronous is fine
     App.gameInstance.init();
 }
 
@@ -44,9 +44,15 @@ function backToMenu() {
     }
 }
 
-function resetGame() {
-    if (App.gameInstance) App.gameInstance.init();
-}
+// Exposed globally to ensure onclick works
+window.resetGame = function () {
+    console.log("Reset Game called");
+    if (App.gameInstance) {
+        App.gameInstance.init();
+    } else {
+        console.warn("No game instance to reset");
+    }
+};
 
 // --- Base Game Class ---
 class SortGame {
@@ -58,18 +64,23 @@ class SortGame {
     }
 
     init() {
-        ui.gameTitle.innerText = this.title;
-        ui.controls.innerHTML = ''; // Clear controls
+        console.log("Initializing Game: " + this.title);
+        // Clear controls
+        ui.controls.innerHTML = '';
 
         // Read size from input
-        let sizeInput = document.getElementById('input-size');
-        let size = parseInt(sizeInput.value);
+        const sizeInput = document.getElementById('input-size');
+        let size = 5;
+        if (sizeInput) {
+            size = parseInt(sizeInput.value);
+            // Validation constraint
+            if (isNaN(size) || size < 5) size = 5;
+            if (size > 20) size = 20;
+            // Update UI
+            sizeInput.value = size;
+        }
 
-        // Validation constraint
-        if (isNaN(size) || size < 5) size = 5;
-        if (size > 20) size = 20;
-        sizeInput.value = size; // Update UI to reflect constrained value
-
+        console.log("Generating array of size:", size);
         this.array = this.generateRandomArray(size);
         this.isComplete = false;
         this.render();
@@ -77,7 +88,8 @@ class SortGame {
     }
 
     generateRandomArray(size) {
-        return Array.from({ length: size }, () => Math.floor(Math.random() * 99) + 1); // 1-99 makes more sense for larger sets? or keep 1-9
+        // Generate numbers between 1 and 99
+        return Array.from({ length: size }, () => Math.floor(Math.random() * 99) + 1);
     }
 
     render() {
@@ -97,6 +109,7 @@ class SortGame {
     }
 
     setMessage(msg, type = 'normal') {
+        if (!ui.instruction) return;
         ui.instruction.innerText = msg;
         ui.instruction.style.color = type === 'error' ? '#e74c3c' : (type === 'success' ? '#2ecc71' : '#16a085');
         if (type === 'error') {
@@ -111,7 +124,7 @@ class SortGame {
             c.classList.remove('comparing', 'selected');
             c.classList.add('sorted');
         });
-        ui.controls.innerHTML = ''; // Clear buttons
+        ui.controls.innerHTML = '';
     }
 
     cleanup() { }
@@ -175,19 +188,14 @@ class BubbleSortGame extends SortGame {
 
         if (correct) {
             if (action === 'swap') {
-                // Swap logic
                 [this.array[this.j], this.array[this.j + 1]] = [this.array[this.j + 1], this.array[this.j]];
-                this.render(); // Re-render to show swap
-                // Add flash effect
+                this.render();
                 document.getElementById(`card-${this.j}`).classList.add('flash');
                 document.getElementById(`card-${this.j + 1}`).classList.add('flash');
             } else {
-                // Just flash green to confirm correct choice
                 document.getElementById(`card-${this.j}`).classList.add('flash');
                 document.getElementById(`card-${this.j + 1}`).classList.add('flash');
             }
-
-            // Move to next step
             setTimeout(() => this.nextStep(), this.stepDelay);
         }
     }
@@ -207,7 +215,6 @@ class BubbleSortGame extends SortGame {
     nextStep() {
         this.j++;
         if (this.j >= this.array.length - 1 - this.i) {
-            // End of pass, mark last element as sorted
             document.getElementById(`card-${this.array.length - 1 - this.i}`).classList.add('sorted');
             this.j = 0;
             this.i++;
@@ -221,12 +228,9 @@ class BubbleSortGame extends SortGame {
         }
     }
 
-    // Override render to keep sorted styling
     render() {
         super.render();
-        // Re-apply sorted styles based on logic state
         for (let k = 0; k < this.i; k++) {
-            // bubble sort builds sorted from end
             let idx = this.array.length - 1 - k;
             const card = document.getElementById(`card-${idx}`);
             if (card) card.classList.add('sorted');
@@ -238,19 +242,16 @@ class BubbleSortGame extends SortGame {
 class InsertionSortGame extends SortGame {
     constructor() {
         super("插入排序 (Insertion Sort)");
-        this.sortedEndIndex = 0; // Index of the last element in the sorted portion
+        this.sortedEndIndex = 0;
     }
 
     init() {
         this.sortedEndIndex = 0;
         super.init();
-        // Initially, the first element (index 0) is considered sorted
-        document.getElementById('card-0').classList.add('sorted');
+        // Index 0 is initially sorted
+        const c0 = document.getElementById('card-0');
+        if (c0) c0.classList.add('sorted');
         this.promptPick();
-    }
-
-    startLogic() {
-        // No static buttons, all interaction is click-based
     }
 
     promptPick() {
@@ -260,19 +261,19 @@ class InsertionSortGame extends SortGame {
             return;
         }
         this.setMessage("👆 請點擊「未排序區域」的第一張卡片");
-        // Make the next unsorted card clickable
         const targetIndex = this.sortedEndIndex + 1;
         const card = document.getElementById(`card-${targetIndex}`);
-        card.classList.add('clickable');
-        card.onclick = () => this.handlePick(targetIndex);
+        if (card) {
+            card.classList.add('clickable');
+            card.onclick = () => this.handlePick(targetIndex);
+        }
     }
 
     handlePick(index) {
-        // Remove click handler
         const card = document.getElementById(`card-${index}`);
         card.onclick = null;
         card.classList.remove('clickable');
-        card.classList.add('selected'); // Lift up
+        card.classList.add('selected');
 
         this.currentVal = this.array[index];
         this.currentIndex = index;
@@ -285,17 +286,16 @@ class InsertionSortGame extends SortGame {
         ui.board.innerHTML = '';
 
         // 1. Slots and Sorted Cards
-        // We render slots relative to the sorted array indices
         for (let i = 0; i <= this.sortedEndIndex; i++) {
             this.createSlot(i);
-            ui.board.appendChild(this.createCardElement(this.array[i], i, true)); // true = isSorted
+            ui.board.appendChild(this.createCardElement(this.array[i], i, true));
         }
-        // Final slot for the sorted area
+        // Final slot
         this.createSlot(this.sortedEndIndex + 1);
 
-        // 2. The Selected Card (visually separated to indicate it's being moved)
+        // 2. The Selected Card
         const selectedContainer = document.createElement('div');
-        selectedContainer.style.marginLeft = '20px'; // Visual gap
+        selectedContainer.style.marginLeft = '20px';
         selectedContainer.style.display = 'flex';
         selectedContainer.style.gap = '15px';
         selectedContainer.style.alignItems = 'center';
@@ -304,7 +304,7 @@ class InsertionSortGame extends SortGame {
         selected.classList.add('selected');
         selectedContainer.appendChild(selected);
 
-        // 3. The rest of the unsorted cards
+        // 3. The rest
         for (let i = this.currentIndex + 1; i < this.array.length; i++) {
             selectedContainer.appendChild(this.createCardElement(this.array[i], i));
         }
@@ -319,7 +319,6 @@ class InsertionSortGame extends SortGame {
         ui.board.appendChild(slot);
     }
 
-    // Helper to create card with sorted class option
     createCardElement(num, index, isSorted = false) {
         const div = super.createCardElement(num, index);
         if (isSorted) div.classList.add('sorted');
@@ -327,12 +326,7 @@ class InsertionSortGame extends SortGame {
     }
 
     handleInsert(slotIndex) {
-        // Validation
-        // The correct slot is the first index where array[i] > currentVal
-        // OR the end of sorted part if currentVal is largest.
-
         let correctSlot = 0;
-        // Find correct position in virtual sorted array (0 to this.sortedEndIndex)
         for (let i = 0; i <= this.sortedEndIndex; i++) {
             if (this.currentVal < this.array[i]) {
                 correctSlot = i;
@@ -343,25 +337,16 @@ class InsertionSortGame extends SortGame {
 
         if (slotIndex === correctSlot) {
             this.setMessage("✅ 正確！插入成功", 'success');
-
-            // Logic: Remove from old index, insert at new index
-            // array is [sorted... , target, unsorted...]
-            // target is at this.sortedEndIndex + 1
             const val = this.array.splice(this.currentIndex, 1)[0];
             this.array.splice(slotIndex, 0, val);
-
             this.sortedEndIndex++;
-            this.render(); // Re-render standard view
-
-            // Highlight sorted part
+            this.render();
             for (let i = 0; i <= this.sortedEndIndex; i++) {
                 document.getElementById(`card-${i}`).classList.add('sorted');
             }
-
             setTimeout(() => this.promptPick(), this.stepDelay);
         } else {
             this.setMessage(`❌ 錯誤！${this.currentVal} 不應該放在這裡`, 'error');
-            // Shake all slots? or just the board
             ui.board.classList.add('shake');
             setTimeout(() => ui.board.classList.remove('shake'), 500);
         }
@@ -372,7 +357,7 @@ class InsertionSortGame extends SortGame {
 class SelectionSortGame extends SortGame {
     constructor() {
         super("選擇排序 (Selection Sort)");
-        this.sortedIndex = 0; // Where we are placing the next min
+        this.sortedIndex = 0;
     }
 
     init() {
@@ -384,14 +369,13 @@ class SelectionSortGame extends SortGame {
     promptFindMin() {
         if (this.sortedIndex >= this.array.length - 1) {
             this.isComplete = true;
-            this.render(); // Make sure all look sorted
+            this.render();
             this.playSuccess();
             return;
         }
 
         this.setMessage(`🔍 回合 ${this.sortedIndex + 1}: 請找出未排序區域（白色卡片）中的「最小值」`);
 
-        // Make unsorted cards clickable
         for (let i = this.sortedIndex; i < this.array.length; i++) {
             const card = document.getElementById(`card-${i}`);
             if (card) {
@@ -402,13 +386,11 @@ class SelectionSortGame extends SortGame {
     }
 
     handleSelection(index) {
-        // Remove clicks
         document.querySelectorAll('.clickable').forEach(el => {
             el.classList.remove('clickable');
             el.onclick = null;
         });
 
-        // Check if it is really the minimum
         let minVal = this.array[this.sortedIndex];
         let minIdx = this.sortedIndex;
 
@@ -422,40 +404,32 @@ class SelectionSortGame extends SortGame {
         const pickedVal = this.array[index];
 
         if (pickedVal === minVal) {
-            // Correct
             const card = document.getElementById(`card-${index}`);
-            card.classList.add('selected'); // Highlight pick
+            card.classList.add('selected');
             this.setMessage(`✅ 正確！最小值是 ${minVal}，正在交換...`, 'success');
 
             setTimeout(() => {
-                // Swap Logic
                 [this.array[this.sortedIndex], this.array[index]] = [this.array[index], this.array[this.sortedIndex]];
-
-                this.render(); // update view
-                // Mark newly sorted
+                this.render();
                 document.getElementById(`card-${this.sortedIndex}`).classList.add('sorted');
-                // Mark others sorted
                 for (let k = 0; k < this.sortedIndex; k++) document.getElementById(`card-${k}`).classList.add('sorted');
-
                 this.sortedIndex++;
                 setTimeout(() => this.promptFindMin(), this.stepDelay);
             }, 800);
 
         } else {
-            // Wrong
             this.setMessage(`❌ 錯誤！${pickedVal} 不是目前的最小值 (最小值是 ${minVal})`, 'error');
             const card = document.getElementById(`card-${index}`);
             card.classList.add('shake');
             setTimeout(() => {
                 card.classList.remove('shake');
-                this.promptFindMin(); // retry
+                this.promptFindMin();
             }, 500);
         }
     }
 
     render() {
         super.render();
-        // Keep sorted items green
         for (let i = 0; i < this.sortedIndex; i++) {
             const card = document.getElementById(`card-${i}`);
             if (card) card.classList.add('sorted');
@@ -465,3 +439,7 @@ class SelectionSortGame extends SortGame {
 
 // Initial Listener
 ui.btnBack.addEventListener('click', backToMenu);
+
+// Make functions global
+window.startGame = startGame;
+window.backToMenu = backToMenu;
