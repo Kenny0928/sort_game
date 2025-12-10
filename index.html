@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>演算法課後練習系統</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- View A: Main Menu -->
+        <div id="view-menu" class="view active">
+            <h1 class="hero-title">演算法課後練習系統</h1>
+            <p class="subtitle">請選擇一個主題開始挑戰！</p>
+
+            <div class="menu-grid">
+                <div class="menu-card" onclick="startGame('bubble')">
+                    <h3>氣泡排序</h3>
+                    <p>Bubble Sort</p>
+                </div>
+                <div class="menu-card" onclick="startGame('insertion')">
+                    <h3>插入排序</h3>
+                    <p>Insertion Sort</p>
+                </div>
+                <div class="menu-card" onclick="startGame('selection')">
+                    <h3>選擇排序</h3>
+                    <p>Selection Sort</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- View B: Game Board -->
+        <div id="view-game" class="view">
+            <div class="top-bar">
+                <button id="btn-back" class="btn btn-outline">⬅️ 返回選單</button>
+                <div id="game-title" class="game-title">排序與演算法</div>
+                <button id="btn-reset" class="btn btn-outline" style="font-size: 0.9em;">🔄 重置</button>
+            </div>
+
+            <div id="instruction-text" class="instruction-box">
+                請依照指示完成排序
+            </div>
+
+            <div id="game-board" class="game-board">
+                <!-- Cards will be injected here -->
+            </div>
+
+            <div id="controls-area" class="controls-area">
+                <!-- Dynamic buttons -->
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
