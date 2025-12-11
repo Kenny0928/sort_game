@@ -34,14 +34,36 @@
 
         <!-- View B: Game Board -->
         <div id="view-game" class="view">
-            <div class="top-bar">
-                <button id="btn-back" type="button" class="btn btn-outline">⬅️ 返回選單</button>
-                <div class="settings-group">
-                    <label for="input-size">數量(5-20):</label>
+            <!-- New Layout Structure -->
+            <div class="nav-header">
+                <button id="btn-back" type="button" class="btn btn-naked">⬅️ 返回選單</button>
+            </div>
+
+            <div class="settings-toolbar">
+                <div class="control-group">
+                    <label for="input-size">數量</label>
                     <input type="number" id="input-size" min="5" max="20" value="5">
-                    <button id="btn-reset" type="button" class="btn btn-outline" style="font-size: 0.9em;"
-                        onclick="resetGame()">🔄 設定並重置</button>
                 </div>
+
+                <div class="control-group">
+                    <label for="select-order">順序</label>
+                    <select id="select-order">
+                        <option value="asc">遞增 (小 → 大)</option>
+                        <option value="desc">遞減 (大 → 小)</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label for="select-convergence">收斂</label>
+                    <select id="select-convergence">
+                        <option value="left">向左 (Left)</option>
+                        <option value="right">向右 (Right)</option>
+                    </select>
+                </div>
+
+                <button id="btn-reset" type="button" class="btn btn-secondary action-btn" onclick="resetGame()">
+                    🔄 重置
+                </button>
             </div>
 
             <div id="instruction-text" class="instruction-box">
